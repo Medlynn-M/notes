@@ -15285,136 +15285,627 @@ body.jp-Notebook .jp-Cell:focus-within {
   body.jp-Notebook .jp-Cell:hover { transform: none; }
 }
 </style>
+<style id="notes-python-code">
+.notes-code { margin: 18px 0; border: 1px solid #393b49; border-radius: 10px; overflow: hidden; background: #191b23; }
+.notes-code-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 14px; background: #252733; color: #c8b6ff; font-size: 13px; }
+.copy-code { min-height: 36px; padding: 5px 12px; border: 1px solid #555768; border-radius: 6px; background: #303240; color: #f1f2f7; font: inherit; cursor: pointer; }
+.copy-code:hover { background: #414455; }
+.copy-code:focus-visible { outline: 2px solid #c8b6ff; outline-offset: 2px; }
+.jp-RenderedMarkdown .notes-code pre { margin: 0; padding: 16px; background: #191b23; color: #e6e8f0; overflow-x: auto; white-space: pre; line-height: 1.65; }
+.jp-RenderedMarkdown .notes-code pre code { background: transparent; padding: 0; color: inherit; font-family: Consolas, 'Liberation Mono', monospace; font-size: 14px; white-space: pre; overflow-wrap: normal; }
+.hljs-keyword, .hljs-literal { color: #c8a7ff; }
+.hljs-string { color: #a8d5a2; }
+.hljs-number { color: #f6bc84; }
+.hljs-comment { color: #9aa4b6; font-style: italic; }
+.hljs-built_in, .hljs-title { color: #82caff; }
+.hljs-params, .hljs-variable { color: #e6e8f0; }
+@media(max-width:640px) { .jp-RenderedMarkdown .notes-code pre { padding: 12px; } .copy-code { min-height: 44px; } }
+</style>
 </head>
 <body class="jp-Notebook" data-jp-theme-light="false" data-jp-theme-name="JupyterLab Dark">
 <div id="cell-0" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h2 class="notes-title"><b><span style="color:#79b8ff">LANGGRAPH</span></b></h2></div></div></div></div>
 <div id="cell-1" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><ul>
 <li>LangGraph is an <span style="color: limegreen;">orchestration framework</span> for applications that need multiple steps, shared state, branching, loops, and recovery. It lets you combine predictable Python logic with LLM-driven decisions.</li>
+<li>LangGraph helps you build an application as connected steps, carry data between those steps, and recover when execution fails.</li>
 </ul>
+<br>
+
+<p>These notes cover its main concepts and production applications. We’ll use one example throughout: read an email, extract funding details, validate them, and save the result.</p>
 </div></div></div></div>
-<div id="cell-2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">1. Where LangGraph Fits?</span></h3>
+<div id="cell-2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">1. Why do we need LangGraph?</span></h3>
+<p>A simple AI application sends a prompt to an LLM and receives an answer. A larger application might need to:</p>
+<ul>
+<li>Extract information.</li>
+<li>Look up related records.</li>
+<li>Run independent tasks together.</li>
+<li>Correct an invalid result.</li>
+<li>Wait for a reviewer.</li>
+<li>Recover after a crash.</li>
+</ul>
+<p>LangGraph helps coordinate these operations. You still write the prompts, functions, business rules, and validation.</p>
+</div></div></div></div>
+<div id="cell-3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">2. Where it fits in the AI stack</span></h3>
 <div class="notes-table-scroll"><table>
 <thead>
 <tr>
-<th><span style="color: magenta;">Component</span></th>
-<th><span style="color: magenta;">Main responsibility</span></th>
+<th><span style="color: lightblue;">Component</th>
+<th><span style="color: lightblue;">Responsibility</th>
+<th><span style="color: lightblue;">Simple example</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><span style="color: limegreen;">LLM</span></td>
-<td>Interpret input, generate output, or propose actions</td>
+<td><span style="color: limegreen;"><strong>LLM</strong></td>
+<td>Understand language and produce responses</td>
+<td>Extract CAD 5,000 from an email</td>
 </tr>
 <tr>
-<td><span style="color: limegreen;">LangChain</span></td>
-<td>Model/tool integrations and higher-level agent building</td>
+<td><span style="color: limegreen;"><strong>LangChain</strong></td>
+<td>Provide model/tool integrations and agent abstractions</td>
+<td>Connect an agent to a search tool</td>
 </tr>
 <tr>
-<td><span style="color: limegreen;">LangGraph</span></td>
-<td>Control execution, state, routing, and recovery</td>
+<td><span style="color: limegreen;"><strong>LangGraph</strong></td>
+<td>Manage execution, state, and recovery</td>
+<td>Extract → validate → save</td>
 </tr>
 <tr>
-<td><span style="color: limegreen;">Deep Agents</span></td>
-<td>Add planning, subagents, files, and context management</td>
+<td><span style="color: limegreen;"><strong>Deep Agents</strong></td>
+<td>Provide planning, subagents, files, and context management</td>
+<td>Coordinate a longer research task</td>
 </tr>
 <tr>
-<td><span style="color: limegreen;">LangSmith</span></td>
+<td><span style="color: limegreen;"><strong>LangSmith</strong></td>
 <td>Trace, evaluate, debug, and deploy applications</td>
+<td>Inspect why a workflow failed</td>
 </tr>
 </tbody></table></div>
 <br>
 
-<ul>
-<li>We can call existing model API client inside LangGraph nodes. LangChain model wrappers and LangSmith are optional for using the core framework.</li>
-</ul>
+<p>We can call existing model API client inside LangGraph nodes. LangChain model wrappers and LangSmith are optional for using the core framework.</p>
 </div></div></div></div>
-<div id="cell-3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">2. The theory: a graph-based state machine</span></h3>
+<div id="cell-4" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">3. What graph and state machine mean</span></h3>
 <ul>
-<li>A graph contains <span style="color: limegreen;">nodes</span> connected by <span style="color: limegreen;">directed edges</span>. The direction indicates where execution can proceed.</li>
-<li>A <span style="color: limegreen;">state machine</span> changes its working data and chooses its next action according to rules.</li>
-<li>LangGraph combines these ideas: <span style="color: limegreen;">nodes process data</span>, <span style="color: limegreen;">update state</span>, and <span style="color: limegreen;">trigger subsequent nodes</span>.</li>
-<li>Unlike a DAG, which cannot contain cycles, LangGraph <span style="color: limegreen;">supports cycles</span>. This enables correction loops and repeated tool use.</li>
-<li>The graph defines permitted behavior. Whether a transition is chosen by Python or an LLM depends on your design.</li>
+<li>A graph contains steps called <span style="color: limegreen;">nodes</span>, connected by paths called <span style="color: limegreen;">edges</span>.</li>
+<li><span style="color: limegreen;">A directed graph</span> specifies which direction execution can move.</li>
+<li>A <span style="color: limegreen;">state machine</span> chooses actions according to its current data and rules.</li>
+<li>LangGraph combines these ideas: <span style="color: limegreen;">execute a step</span>, <span style="color: limegreen;">update data</span>, and <span style="color: limegreen;">decide what happens next</span>.</li>
+<li>A DAG cannot loop back. LangGraph <span style="color: limegreen;">supports cycles</span>, allowing repeated correction or tool use.</li>
 </ul>
+<p><span style="color: lightblue;">Example</span>: if validation fails, return to correction; if it passes, continue to saving.</p>
 </div></div></div></div>
-<div id="cell-4" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">3. State, nodes, and edges</span></h3>
+<div id="cell-5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">4. The core building blocks</span></h3>
 <div class="notes-table-scroll"><table>
 <thead>
 <tr>
-<th><span style="color: magenta;">Concept</span></th>
-<th><span style="color: magenta;">Meaning</span></th>
-<th><span style="color: magenta;">Email extraction example</span></th>
+<th><span style="color: lightblue;">Concept</th>
+<th><span style="color: lightblue;">Meaning</th>
+<th><span style="color: lightblue;">Our example</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>State</td>
-<td>Working data carried through execution</td>
-<td>Email, amounts, periods, errors</td>
+<td><span style="color: limegreen;"><strong>State</strong></td>
+<td>Working data available during execution</td>
+<td>Email, amounts, errors</td>
 </tr>
 <tr>
-<td>Node</td>
-<td>Function performing a step</td>
+<td><span style="color: limegreen;"><strong>Node</strong></td>
+<td>Function that performs an operation</td>
 <td>Extract amounts</td>
 </tr>
 <tr>
-<td>Edge</td>
+<td><span style="color: limegreen;"><strong>Edge</strong></td>
 <td>Connection between steps</td>
-<td>Amount extraction → period extraction</td>
+<td>Extract → validate</td>
 </tr>
 <tr>
-<td>Conditional edge</td>
-<td>Route selected from current state</td>
-<td>Valid → save; ambiguous → review</td>
+<td><span style="color: limegreen;"><strong>Conditional edge</strong></td>
+<td>Connection selected using a condition</td>
+<td>Valid → save; unclear → review</td>
 </tr>
 <tr>
-<td><code>START</code> / <code>END</code></td>
-<td>Entry and completion markers</td>
-<td>Begin processing / finish</td>
+<td><span style="color: limegreen;"><strong>START</strong></td>
+<td>Entry marker</td>
+<td>Begin processing</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;"><strong>END</strong></td>
+<td>Completion marker</td>
+<td>Finish processing</td>
 </tr>
 </tbody></table></div>
 <br>
 
+<p>A node can execute Python, SQL, regex, an API call, or an LLM call. A node does not have to be an agent.</p>
+</div></div></div></div>
+<div id="cell-6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">5. State: the workflow’s working data</span></h3>
+<p>Imagine passing a folder between workers. Each worker reads what they need and adds their result. State serves a similar purpose.</p>
+<div class="notes-code"><div class="notes-code-toolbar"><span>Python</span><button type="button" class="copy-code" aria-label="Copy code">Copy</button></div><pre><code class="hljs language-python">{
+    <span class="hljs-string">&quot;email&quot;</span>: <span class="hljs-string">&quot;We agree to CAD 5,000 for Christmas.&quot;</span>,
+    <span class="hljs-string">&quot;amount&quot;</span>: <span class="hljs-number">5000</span>,
+    <span class="hljs-string">&quot;period&quot;</span>: <span class="hljs-string">&quot;Christmas&quot;</span>,
+    <span class="hljs-string">&quot;validation_errors&quot;</span>: []
+}</code></pre></div>
 <ul>
-<li>A node can use regex, SQL, an API, or an LLM. A node is not automatically an agent.</li>
+<li>State changes as nodes complete.</li>
+<li>Nodes normally return <span style="color: limegreen;">partial updates</span>, such as {&quot;amount&quot;: 5000}.</li>
+<li>Fields not updated remain available.</li>
+<li><span style="color: limegreen;">Return updates</span> instead of directly modifying the input state.</li>
+<li>State does not automatically become model input. Your code chooses what to send to the LLM.</li>
 </ul>
 </div></div></div></div>
-<div id="cell-5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">4. State schemas and data contracts</span></h3>
+<div id="cell-7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">6. Schemas: defining the data contract</span></h3>
+<p>A schema describes expected fields and types.</p>
+<div class="notes-table-scroll"><table>
+<thead>
+<tr>
+<th><span style="color: lightblue;">Schema option</th>
+<th><span style="color: lightblue;">Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span style="color: limegreen;"><code>TypedDict</code></span></td>
+<td>Describes dictionary fields for type checking; no runtime validation</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;">Dataclass</span></td>
+<td>Defines structured Python data and defaults</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;">Pydantic</span></td>
+<td>Supports validation and conversion of data at runtime</td>
+</tr>
+</tbody></table></div>
+<p>There are also different schema roles:</p>
 <ul>
-<li>A <span style="color: limegreen;">schema</span> describes fields and expected types. Common choices are <code>TypedDict</code>, dataclasses, and Pydantic.</li>
-<li><code>TypedDict</code> supplies <span style="color: limegreen;">type hints</span>; it <span style="color: limegreen;">does not validate values at runtime</span>. <span style="color: limegreen;">Pydantic supports runtime validation</span>.</li>
-<li>You can <span style="color: limegreen;">separate input, internal, and output schemas</span>. This keeps intermediate data out of the returned result.</li>
-<li>The <span style="color: limegreen;">graph-state schema</span> defines <span style="color: limegreen;">workflow data</span>. An <span style="color: limegreen;">LLM-output schema</span> defines the <span style="color: limegreen;">response expected from the model</span>.</li>
-<li><span style="color: limegreen;">Correct structure does not prove factual correctness</span>: amount=5000 can satisfy the schema while contradicting the email.</li>
-<li>Keep checkpointed data serializable. Pass clients and connections through appropriate runtime dependencies.</li>
+<li><span style="color: limegreen;">Input schema</span>: what the caller supplies.</li>
+<li><span style="color: limegreen;">Internal state schema</span>: information used during execution.</li>
+<li><span style="color: limegreen;">Output schema</span>: what the workflow returns.</li>
+<li><span style="color: limegreen;">LLM-output schema</span>: structure expected from a model response.</li>
+</ul>
+<p><span style="color: lightblue;">Example</span>: the graph receives an email, stores intermediate errors, and returns extracted records. The model’s separate output schema requires an amount and currency.</p>
+<p>Valid structure does not guarantee correct facts. 5000 can be a valid number while being the wrong amount.</p>
+</div></div></div></div>
+<div id="cell-8" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">7. Nodes: deciding the size of each step</span></h3>
+<p>Give each node a meaningful responsibility.</p>
+<ul>
+<li><span style="color: limegreen;">Good boundary</span>: extract amounts, validate evidence, save records.</li>
+<li><span style="color: limegreen;">Too large</span>: one node reads data, makes five calls, validates, and writes everything.</li>
+<li><span style="color: limegreen;">Too fragmented</span>: separate nodes for every tiny Python operation.</li>
+</ul>
+<p>Smaller meaningful nodes make failures easier to isolate and reduce repeated work during recovery. Larger nodes may simplify code but hide intermediate progress.</p>
+<ul>
+<li>A function named <code>AmountAgent</code> is still just an extraction function unless it independently chooses actions.</li>
+<li>A function’s name does not make it an agent. An extraction function performs a predefined task, such as extracting amounts from an email. An <span style="color: limegreen;">agent lets the model choose its next action</span>, such as reading an attachment or retrieving another message, using permitted tools.</li>
+<li>Multiple LLM calls executed in a code-defined sequence form an LLM-powered workflow, not necessarily an autonomous agent.</li>
 </ul>
 </div></div></div></div>
-<div id="cell-6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">5. Nodes and partial updates</span></h3>
+<div id="cell-9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">8. Reducers: how updates are combined</span></h3>
+<p>A reducer decides how an existing state value combines with a new update.</p>
+<div class="notes-table-scroll"><table>
+<thead>
+<tr>
+<th><span style="color: lightblue;">Update rule</span></th>
+<th><span style="color: lightblue;">Existing value</span></th>
+<th><span style="color: lightblue;">New update</span></th>
+<th><span style="color: lightblue;">Result</span></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span style="color: limegreen;">Default replacement</span></td>
+<td><code>[5000]</code></td>
+<td><code>[6000]</code></td>
+<td><code>[6000]</code></td>
+</tr>
+<tr>
+<td><span style="color: limegreen;">List concatenation</span></td>
+<td><code>[5000]</code></td>
+<td><code>[6000]</code></td>
+<td><code>[5000, 6000]</code></td>
+</tr>
+</tbody></table></div>
 <ul>
-<li>A node <span style="color: limegreen;">reads state</span> and <span style="color: limegreen;">returns the fields it changes</span>. Other fields remain available.</li>
-<li>Return updates rather than directly mutating the input state.</li>
-<li>Example: an amount node returns {&quot;amounts&quot;: [...]}; it need not return the email again.</li>
-<li>Separate steps when they have different retry, review, or debugging requirements.</li>
-<li><span style="color: limegreen;">Excessively large nodes</span> repeat <span style="color: limegreen;">more work after failure</span>. <span style="color: limegreen;">Excessively fragmented nodes</span> add <span style="color: limegreen;">complexity</span>. Choose boundaries around meaningful operations.</li>
+<li><code>operator.add</code> concatenates lists; it does not remove duplicates.</li>
+<li>With an append reducer, return only the new items.</li>
+<li>An empty list does not clear an append field because adding nothing preserves its contents.</li>
+<li><code>Overwrite</code> explicitly replaces a reducer-managed value.</li>
+</ul>
+<p><span style="color: lightblue;">Example</span>: For revised amounts, replacement is usually appropriate. For results from different attachments, accumulation may be appropriate.</p>
+</div></div></div></div>
+<div id="cell-10" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">9. Messages and conversation history</span></h3>
+<p>Agents often store exchanges as messages:</p>
+<ul>
+<li><span style="color: limegreen;">Human message</span>: user input.</li>
+<li><span style="color: limegreen;">AI message</span>: model response or tool-call request.</li>
+<li><span style="color: limegreen;">Tool message</span>: result of a tool execution.</li>
+</ul>
+<p><code>MessagesState</code> supplies a messages field with the <code>add_messages</code> reducer. It <span style="color: limegreen;">appends new messages</span> and <span style="color: limegreen;">updates existing messages</span> by ID.</p>
+<p>Saving history does not mean the model automatically sees it. The model node must include the relevant messages in its request.</p>
+</div></div></div></div>
+<div id="cell-11" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">10. Edges and routing</span></h3>
+<ul>
+<li>A normal edge always goes to a specified next node.</li>
+<li>A <span style="color: limegreen;">conditional edge</span> calls a <span style="color: limegreen;">routing function</span> to select the next node.</li>
+<li>Command can combine a state update and routing decision in one return value.</li>
+</ul>
+<p><span style="color: lightblue;">Example</span>:</p>
+<div class="notes-code"><div class="notes-code-toolbar"><span>Python</span><button type="button" class="copy-code" aria-label="Copy code">Copy</button></div><pre><code class="hljs language-python"><span class="hljs-keyword">if</span> validation_errors:
+    next_step = <span class="hljs-string">&quot;review&quot;</span>
+<span class="hljs-keyword">else</span>:
+    next_step = <span class="hljs-string">&quot;save&quot;</span></code></pre></div>
+<p>Use Python for clear rules. Use an LLM when routing requires interpreting language.<br>
+Avoid accidentally adding both a fixed route and dynamic routing from the same node: <span style="color: limegreen;">both destinations can execute</span>.</p>
+</div></div></div></div>
+<div id="cell-12" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">11. Parallel execution and supersteps</span></h3>
+<ul>
+<li><span style="color: limegreen;">Parallel execution</span>: independent nodes run together.</li>
+<li><span style="color: limegreen;">Fan-out</span>: start several branches.</li>
+<li><span style="color: limegreen;">Fan-in</span>: combine their results.</li>
+<li><span style="color: limegreen;">Superstep</span>: one execution round containing the nodes scheduled together.</li>
+</ul>
+<p><span style="color: lightblue;">Example</span>: deal-ID extraction and CBM extraction can run in parallel. A later node combines their outputs.</p>
+<p>Nodes in the same superstep work from the state available at its start. One cannot depend on another’s unfinished output.</p>
+<p>If parallel nodes update the same field, use a suitable reducer or separate fields. Explicitly join branches when the next step needs all results.</p>
+</div></div></div></div>
+<div id="cell-13" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">12. Loops, limits, and dynamic tasks</span></h3>
+<p>A loop repeats steps until a condition is satisfied.
+<span style="color: lighblue;">Example</span>: generate a query → validate it → correct it → validate again.</p>
+<ul>
+<li>Define a stopping condition.</li>
+<li>Limit correction attempts.</li>
+<li>Set time and cost budgets.</li>
+<li><code>recursion_limit</code> limits graph supersteps, not Python recursion or the total number of model calls.</li>
+</ul>
+<p>Send creates tasks dynamically. For ten attachments, create ten processing tasks.</p>
+<p>This <span style="color: limegreen;">supports map-reduce</span>: process each item independently, then combine the outputs. Parallel work still consumes API capacity and tokens.</p>
+</div></div></div></div>
+<div id="cell-14" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">13. Workflow versus agent</span></h3>
+<div class="notes-table-scroll"><table>
+<thead>
+<tr>
+<th><span style="color: lightblue;">Workflow</span></th>
+<th><span style="color: lightblue;">Agent</span></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Your code largely controls the sequence</td>
+<td>The model dynamically chooses actions</td>
+</tr>
+<tr>
+<td>Usually easier to predict and test</td>
+<td>More flexible for open-ended tasks</td>
+</tr>
+<tr>
+<td>Example: extract → validate → save</td>
+<td>Example: investigate a problem using selected tools</td>
+</tr>
+</tbody></table></div>
+<p>A typical tool-calling agent repeats:</p>
+<ol>
+<li>Model proposes a tool call.</li>
+<li>Application executes the tool.</li>
+<li>Tool result returns to the model.</li>
+<li>Model chooses another action or finishes.</li>
+</ol>
+<p>The model proposes actions; your application controls whether and how they execute. LangGraph supports workflows, agents, and combinations of both.</p>
+</div></div></div></div>
+<div id="cell-15" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">14. Common architecture patterns</span></h3>
+<div class="notes-table-scroll"><table>
+<thead>
+<tr>
+<th><span style="color: lightblue;">Pattern</span></th>
+<th><span style="color: lightblue;">Explanation</span></th>
+<th><span style="color: lightblue;">Example</span></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span style="color: limegreen;">Sequential chaining</span></td>
+<td>Each step feeds the next</td>
+<td>Extract → normalise → validate</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;">Routing</span></td>
+<td>Select a path or specialist</td>
+<td>Invoice → invoice processor</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;">Parallelisation</span></td>
+<td>Run independent operations together</td>
+<td>Extract IDs and contacts</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;">Orchestrator–worker</span></td>
+<td>Coordinator distributes dynamically identified work</td>
+<td>Analyse each section of a report</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;">Evaluator–optimizer</span></td>
+<td>Evaluate an output and request corrections</td>
+<td>Fix a query that fails validation</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;">Tool-calling agent</span></td>
+<td>Model repeatedly selects tools</td>
+<td>Investigate an unfamiliar issue</td>
+</tr>
+</tbody></table></div>
+<p>Choose the simplest pattern that meets the requirement. Multiple agents do not automatically improve quality.</p>
+</div></div></div></div>
+<div id="cell-16" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">15. Subgraphs and multiple agents</span></h3>
+<p>A subgraph is a <span style="color: limegreen;">complete smaller workflow</span> used inside a larger one.</p>
+<p><span style="color: lightblue;">Example</span>: a document-processing graph contains a reusable validation subgraph.</p>
+<ul>
+<li>Parent and subgraph can share state fields.</li>
+<li>If their schemas differ, translate inputs and outputs through an adapter.</li>
+<li>Choose whether subgraph history should persist between calls or remain isolated.</li>
+</ul>
+<p>Common multi-agent arrangements:</p>
+<ul>
+<li><span style="color: limegreen;">Supervisor</span>: a coordinator delegates to specialists.</li>
+<li><span style="color: limegreen;">Handoff</span>: one specialist transfers responsibility to another.</li>
+</ul>
+<p>Use multiple agents when they need distinct tools, instructions, or context. Account for coordination mistakes, extra latency, and cost.</p>
+</div></div></div></div>
+<div id="cell-17" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">16. Checkpoints, threads, and runs</span></h3>
+<div class="notes-table-scroll"><table>
+<thead>
+<tr>
+<th><span style="color: lightblue;">Term</span></th>
+<th><span style="color: lightblue;">Meaning</span></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><span style="color: limegreen;"><strong>Run</strong></span></td>
+<td>An execution attempt</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;"><strong>Thread</strong></span></td>
+<td>Saved execution context that can span multiple runs</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;"><strong>Checkpoint</strong></span></td>
+<td>Snapshot of state and execution progress</td>
+</tr>
+<tr>
+<td><span style="color: limegreen;"><strong>Checkpointer</strong></span></td>
+<td>Component that stores and retrieves checkpoints</td>
+</tr>
+</tbody></table></div>
+<p>Supply a <code>thread_id</code> when using checkpointing.</p>
+<p><span style="color: lightblue;">Example</span>: one ID identifies processing for email A. If processing fails, continue using that same saved context. Email B should have its own context.</p>
+<p>Checkpoints capture <span style="color: limegreen;">superstep progress</span>. Saved pending writes can preserve successful parallel results when another branch fails.</p>
+<p>In-memory checkpoints disappear after restart. Production recovery requires durable storage.</p>
+</div></div></div></div>
+<div id="cell-18" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">17. Memory and context engineering</span></h3>
+<ul>
+<li><span style="color: limegreen;">Short-term memory</span>: data belonging to one thread, such as its conversation.</li>
+<li><span style="color: limegreen;">Long-term memory</span>: data stored across threads, such as preferences or shared facts.</li>
+<li>A <span style="color: limegreen;">store</span> holds cross-thread data; nodes retrieve it when needed.</li>
+<li><span style="color: limegreen;">Context engineering</span>: deciding which instructions, evidence, history, and tool results each model call receives.</li>
+</ul>
+<p><span style="color: lightblue;">Example</span>: the status node receives the email plus linked amounts and periods. It does not need unrelated logs.</p>
+<p>Longer context is not automatically better. Select relevant information and preserve exact evidence when amounts, IDs, or wording matter.</p>
+</div></div></div></div>
+<div id="cell-19" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">18. Durable execution and idempotency</span></h3>
+<ul>
+<li>Durable execution allows continuation from persisted progress after interruption or failure. It does not preserve a running Python process at every line.</li>
+<li><span style="color: limegreen;">Checkpointed tasks</span> can <span style="color: limegreen;">save completed operations</span> within a larger function, reducing repeated work.</li>
+<li>However, an operation may still execute again. <span style="color: limegreen;">Idempotency means repetition does not create duplicate effects</span>.</li>
+</ul>
+<p><span style="color: lightblue;">Example</span>: upsert a record using a stable key instead of blindly appending it.</p>
+<div class="notes-table-scroll"><table>
+<thead>
+<tr>
+<th><span style="color: lightblue;">Durability mode</th>
+<th><span style="color: lightblue;">When state is persisted</th>
+<th><span style="color: lightblue;">Main trade-off</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>sync</code></td>
+<td>Before the next step</td>
+<td>Stronger durability, more overhead</td>
+</tr>
+<tr>
+<td><code>async</code></td>
+<td>While execution continues</td>
+<td>Better performance, a crash window</td>
+</tr>
+<tr>
+<td><code>exit</code></td>
+<td>When execution exits</td>
+<td>Intermediate progress may be lost on a crash</td>
+</tr>
+</tbody></table></div>
+<p>Checkpointing <span style="color: limegreen;">does not guarantee</span> exactly-once external writes.</p>
+</div></div></div></div>
+<div id="cell-20" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">19. Errors, retries, and correction</span></h3>
+<div class="notes-table-scroll"><table>
+<thead>
+<tr>
+<th><span style="color: lightblue;">Problem</span></th>
+<th><span style="color: lightblue;">Appropriate response</span></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Temporary network failure</td>
+<td>Bounded retry</td>
+</tr>
+<tr>
+<td>Rate limit</td>
+<td>Retry with backoff</td>
+</tr>
+<tr>
+<td>Invalid credentials</td>
+<td>Fix configuration</td>
+</tr>
+<tr>
+<td>Wrong extraction</td>
+<td>Validate and correct or review</td>
+</tr>
+<tr>
+<td>Missing evidence</td>
+<td>Leave unresolved or seek review</td>
+</tr>
+</tbody></table></div>
+<ul>
+<li><span style="color: limegreen;">Backoff</span>: increase the delay between retries.</li>
+<li><span style="color: limegreen;">Jitter</span>: vary delays so many requests do not retry simultaneously.</li>
+<li>Set API and node timeouts.</li>
+<li>Coordinate SDK, graph, and job retries to avoid multiplying attempts.</li>
+<li>A successful API response can still contain an incorrect answer.</li>
+<li>Record failures clearly instead of silently returning empty results as success.</li>
 </ul>
 </div></div></div></div>
-<div id="cell-7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">6. Reducers: combining updates</span></h3>
+<div id="cell-21" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">20. Human review and interrupts</span></h3>
+<p><code>interrupt()</code> pauses execution and requests external input.</p>
+<p><span style="color: lightblue;">Example</span>: two periods could apply to one amount. A reviewer selects the supported association.</p>
 <ul>
-<li>By default, a new value replaces the existing field value.</li>
-<li>A reducer <span style="color: limegreen;">defines how old and new values combine</span>. List concatenation is one example.</li>
-<li>With operator.add, [&quot;error A&quot;] plus [&quot;error B&quot;] becomes [&quot;error A&quot;, &quot;error B&quot;].</li>
-<li>It does not deduplicate. Return only new items when using an append reducer.</li>
-<li>Returning [] to an append field does not clear it. Overwrite can bypass the reducer.</li>
-<li>Use replacement for revised extraction results; accumulation for genuinely additive information.</li>
+<li>Checkpointing preserves the paused context.</li>
+<li>Resume with <code>Command(resume=...)</code> and the <span style="color: limegreen;">same thread ID</span>.</li>
+<li>The interrupted node starts again from its beginning.</li>
+<li>Code before the interrupt may run again, so protect side effects.</li>
+<li>Keep interrupt order consistent and avoid swallowing interrupts with broad exception handling.</li>
+</ul>
+<p>A reviewer should see the evidence and proposed decision, not just an unexplained approve button.</p>
+</div></div></div></div>
+<div id="cell-22" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">21. Inspection, replay, and time travel</span></h3>
+<ul>
+<li><code>get_state()</code> inspects current state.</li>
+<li><code>get_state_history()</code> retrieves checkpoint history.</li>
+<li><code>update_state()</code> creates an updated checkpoint using reducer rules.</li>
+<li><code>Replay</code>: continue from an earlier checkpoint.</li>
+<li><code>Fork</code>: change saved state and explore another execution path.</li>
+</ul>
+<p><span style="color: lightblue;">Example</span>: inspect where an incorrect period appeared, change it, and rerun downstream processing.</p>
+<p>Downstream LLM calls or writes may execute again. Time travel does not undo an email already sent or a database record already written.</p>
+</div></div></div></div>
+<div id="cell-23" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">22. Building, running, and streaming</span></h3>
+<div class="notes-table-scroll"><table>
+<thead>
+<tr>
+<th><span style="color: lightblue;">API</span></th>
+<th><span style="color: lightblue;">Purpose</span></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>StateGraph</code></td>
+<td>Build an explicit graph</td>
+</tr>
+<tr>
+<td><code>.compile()</code></td>
+<td>Prepare it for execution and check structure</td>
+</tr>
+<tr>
+<td><code>.invoke()</code></td>
+<td>Run synchronously</td>
+</tr>
+<tr>
+<td><code>.ainvoke()</code></td>
+<td>Run asynchronously</td>
+</tr>
+<tr>
+<td><code>.stream()</code> / <code>.astream()</code></td>
+<td>Receive incremental progress</td>
+</tr>
+</tbody></table></div>
+<p>The Graph API <span style="color: limegreen;">explicitly declares nodes and connections</span>.</p>
+<p>The Functional API uses <code>@entrypoint</code> and <code>@task</code>, retaining ordinary Python control flow while adding persistence and other capabilities.</p>
+<p>Streaming can expose state changes, snapshots, model tokens, or custom progress events. Token streaming needs compatible model integration.</p>
+<p>Filter streamed data: internal fields can still appear in streams. Compilation checks structure, not business correctness.</p>
+</div></div></div></div>
+<div id="cell-24" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">23. Runtime context, caching, and performance</span></h3>
+<ul>
+<li><span style="color: limegreen;">Runtime context</span>: dependencies/configuration used during execution, such as model choice, client identity, or an API client.</li>
+<li><span style="color: limegreen;">State</span>: changing workflow data.</li>
+<li><span style="color: limegreen;">Caching</span>: reuse a result instead of repeating computation.</li>
+<li><span style="color: limegreen;">Checkpointing</span>: save progress so execution can continue.</li>
+</ul>
+<p><span style="color: lightblue;">Example</span>: cache a document lookup, but checkpoint the extraction workflow.</p>
+<p>Cache keys must distinguish relevant data, model/prompt versions, and tenants. Set <span style="color: limegreen;">expiry</span> when results can become stale.</p>
+<p>Use <span style="color: limegreen;">asynchronous I/O</span> for network-heavy operations and bounded concurrency for throughput. Measure latency and cost per successful result.</p>
+</div></div></div></div>
+<div id="cell-25" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">24. Testing, observability, and evaluation</span></h3>
+<ul>
+<li><span style="color: limegreen;">Testing</span>: verify nodes, routes, loops, joins, failures, and recovery.</li>
+<li><span style="color: limegreen;">Observability</span>: inspect what happened during execution.</li>
+<li><span style="color: limegreen;">Evaluation</span>: measure whether outputs are useful and correct.</li>
+</ul>
+<p>Track node failures, timing, routing, model usage, and tool results.</p>
+<p>Use labelled examples to measure extraction precision, recall, and entity-linking accuracy. Test duplicate writes, restart recovery, and human-review continuation.</p>
+<p><span style="color: limegreen;">LangSmith</span> supports tracing and evaluation; MLflow also integrates with LangChain/LangGraph.</p>
+<p>An LLM judge can assist evaluation, but exact amounts, IDs, and business rules need direct checks.</p>
+</div></div></div></div>
+<div id="cell-26" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">25. Deployment, security, and versioning</span></h3>
+<p>LangGraph is only part of a production system.</p>
+<ul>
+<li>Run it inside your own service/job or use deployment infrastructure such as Agent Server.</li>
+<li>Manage queues, cancellation, connection pools, and API limits.</li>
+<li>Control concurrent operations on the same thread.</li>
+<li>Authenticate users and isolate tenant data. A thread ID is not permission to access its contents.</li>
+<li>Treat emails and retrieved documents as untrusted input.</li>
+<li>Restrict tools and validate proposed actions before executing them.</li>
+<li>Protect checkpoints and traces with access controls and retention rules.</li>
+<li>Pin versions and plan migrations. Changes to node names or state can break paused executions.</li>
 </ul>
 </div></div></div></div>
-<div id="cell-8" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">7. Messages and conversation history</span></h3>
-<ul>
-<li>Agent applications often store human, AI, and tool messages in state.</li>
-<li><code>MessagesState</code> provides a ready-made messages field.</li>
-<li>Its <code>add_messages</code> reducer <span style="color: limegreen;">appends new messages and updates existing ones by message ID</span>.</li>
-<li>Plain list concatenation cannot handle message replacement correctly.</li>
-<li>Stored state is not automatically sent to the LLM. <span style="color: limegreen;">Your model-calling node decides which history and fields enter the request</span>.</li>
-</ul>
+<div id="cell-27" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">26. Applications and production priorities</span></h3>
+<div class="notes-table-scroll"><table>
+<thead>
+<tr>
+<th><span style="color: lightblue;">Application</span></th>
+<th><span style="color: lightblue;">Why LangGraph can help</span></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Email/document extraction</td>
+<td>Dependencies, validation, review, recovery</td>
+</tr>
+<tr>
+<td>RAG</td>
+<td>Retrieve evidence, evaluate it, and route searches</td>
+</tr>
+<tr>
+<td>SQL assistant</td>
+<td>Inspect schemas, validate queries, attempt bounded repairs</td>
+</tr>
+<tr>
+<td>Customer support</td>
+<td>Preserve conversations and route/escalate cases</td>
+</tr>
+<tr>
+<td>Research</td>
+<td>Distribute tasks, use tools, combine findings</td>
+</tr>
+<tr>
+<td>Business automation</td>
+<td>Coordinate persistent steps and approvals</td>
+</tr>
+<tr>
+<td>Coding/data analysis</td>
+<td>Execute tools and iterate on results</td>
+</tr>
+</tbody></table></div>
+<p>These patterns appear in the official application tutorials.</p>
+<p>For production work, prioritise predictable behavior, evidence, recovery, evaluation, security, latency, and cost. Add autonomy when it solves a real requirement.</p>
+<p><span style="color: limegreen;">The distinction to remember</span>: LangGraph can make execution reliable, but accurate extraction still depends on your model, prompts, evidence rules, and validation.</p>
 </div></div></div></div>
-<div id="cell-9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"></div></div></div></div>
+<div id="cell-28" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"></div></div></div></div><script>
+document.querySelectorAll('.copy-code').forEach(button => {
+ button.setAttribute('aria-live', 'polite');
+ button.addEventListener('click', async () => {
+  const code = button.closest('.notes-code').querySelector('code');
+  try {
+   if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(code.textContent);
+   else {
+    const field = document.createElement('textarea');field.value = code.textContent;
+    field.style.position = 'fixed';field.style.opacity = '0';document.body.appendChild(field);field.select();
+    const ok = document.execCommand('copy');field.remove();button.focus();if (!ok) throw new Error('Copy unavailable');
+   }
+   button.textContent = 'Copied!';
+  } catch (_) { button.textContent = 'Select to copy';const range = document.createRange();range.selectNodeContents(code);const selection = window.getSelection();selection.removeAllRanges();selection.addRange(range); }
+  setTimeout(() => { button.textContent = 'Copy'; }, 2000);
+ });
+});
+</script>
 </body>
 </html>
