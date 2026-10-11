@@ -15287,168 +15287,98 @@ body.jp-Notebook .jp-Cell:focus-within {
 </style>
 </head>
 <body class="jp-Notebook" data-jp-theme-light="false" data-jp-theme-name="JupyterLab Dark">
-
-<div id="cell-id=4f10fd93" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 class="notes-title"><b><span style="color:#79b8ff">LANGGRAPH</span></b></h2>
-
-
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=53d70120" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<ul>
+<div id="cell-0" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h2 class="notes-title"><b><span style="color:#79b8ff">LANGGRAPH</span></b></h2></div></div></div></div>
+<div id="cell-1" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><ul>
 <li>LangGraph is an <span style="color: limegreen;">orchestration framework</span> for applications that need multiple steps, shared state, branching, loops, and recovery. It lets you combine predictable Python logic with LLM-driven decisions.</li>
 </ul>
-
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=472188b6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="1.-Where-LangGraph-Fits?"><span style="color: magenta;">1. Where LangGraph Fits?</span><a class="anchor-link" href="#1.-Where-LangGraph-Fits?">&#182;</a></h3>
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=6c4df6ee" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+</div></div></div></div>
+<div id="cell-2" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">1. Where LangGraph Fits?</span></h3>
 <div class="notes-table-scroll"><table>
 <thead>
 <tr>
-  <th><span style="color: magenta;">Component</span></th>
-  <th><span style="color: magenta;">Main responsibility</span></th>
+<th><span style="color: magenta;">Component</span></th>
+<th><span style="color: magenta;">Main responsibility</span></th>
 </tr>
 </thead>
-<tbody>
-<tr>
-  <td><span style="color: limegreen;">LLM</span></td>
-  <td>Interpret input, generate output, or propose actions</td>
+<tbody><tr>
+<td><span style="color: limegreen;">LLM</span></td>
+<td>Interpret input, generate output, or propose actions</td>
 </tr>
 <tr>
-  <td><span style="color: limegreen;">LangChain</span></td>
-  <td>Model/tool integrations and higher-level agent building</td>
+<td><span style="color: limegreen;">LangChain</span></td>
+<td>Model/tool integrations and higher-level agent building</td>
 </tr>
 <tr>
-  <td><span style="color: limegreen;">LangGraph</span></td>
-  <td>Control execution, state, routing, and recovery</td>
+<td><span style="color: limegreen;">LangGraph</span></td>
+<td>Control execution, state, routing, and recovery</td>
 </tr>
 <tr>
-  <td><span style="color: limegreen;">Deep Agents</span></td>
-  <td>Add planning, subagents, files, and context management</td>
+<td><span style="color: limegreen;">Deep Agents</span></td>
+<td>Add planning, subagents, files, and context management</td>
 </tr>
 <tr>
-  <td><span style="color: limegreen;">LangSmith</span></td>
-  <td>Trace, evaluate, debug, and deploy applications</td>
+<td><span style="color: limegreen;">LangSmith</span></td>
+<td>Trace, evaluate, debug, and deploy applications</td>
 </tr>
-</tbody>
-</table></div>
+</tbody></table></div>
 <br>
 
 <ul>
 <li>We can call existing model API client inside LangGraph nodes. LangChain model wrappers and LangSmith are optional for using the core framework.</li>
 </ul>
-
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=dbd26b07" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="2.-The-theory:-a-graph-based-state-machine"><span style="color: magenta;">2. The theory: a graph-based state machine</span><a class="anchor-link" href="#2.-The-theory:-a-graph-based-state-machine">&#182;</a></h3><ul>
+</div></div></div></div>
+<div id="cell-3" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">2. The theory: a graph-based state machine</span></h3>
+<ul>
 <li>A graph contains <span style="color: limegreen;">nodes</span> connected by <span style="color: limegreen;">directed edges</span>. The direction indicates where execution can proceed.</li>
 <li>A <span style="color: limegreen;">state machine</span> changes its working data and chooses its next action according to rules.</li>
 <li>LangGraph combines these ideas: <span style="color: limegreen;">nodes process data</span>, <span style="color: limegreen;">update state</span>, and <span style="color: limegreen;">trigger subsequent nodes</span>.</li>
 <li>Unlike a DAG, which cannot contain cycles, LangGraph <span style="color: limegreen;">supports cycles</span>. This enables correction loops and repeated tool use.</li>
 <li>The graph defines permitted behavior. Whether a transition is chosen by Python or an LLM depends on your design.</li>
 </ul>
-
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=bd29dda4" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="3.-State,-nodes,-and-edges"><span style="color: magenta;">3. State, nodes, and edges</span><a class="anchor-link" href="#3.-State,-nodes,-and-edges">&#182;</a></h3><div class="notes-table-scroll"><table>
+</div></div></div></div>
+<div id="cell-4" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">3. State, nodes, and edges</span></h3>
+<div class="notes-table-scroll"><table>
 <thead>
 <tr>
-  <th><span style="color: magenta;">Concept</span></th>
-  <th><span style="color: magenta;">Meaning</span></th>
-  <th><span style="color: magenta;">Email extraction example</span></th>
+<th><span style="color: magenta;">Concept</span></th>
+<th><span style="color: magenta;">Meaning</span></th>
+<th><span style="color: magenta;">Email extraction example</span></th>
 </tr>
 </thead>
-<tbody>
-<tr>
-  <td>State</td>
-  <td>Working data carried through execution</td>
-  <td>Email, amounts, periods, errors</td>
+<tbody><tr>
+<td>State</td>
+<td>Working data carried through execution</td>
+<td>Email, amounts, periods, errors</td>
 </tr>
 <tr>
-  <td>Node</td>
-  <td>Function performing a step</td>
-  <td>Extract amounts</td>
+<td>Node</td>
+<td>Function performing a step</td>
+<td>Extract amounts</td>
 </tr>
 <tr>
-  <td>Edge</td>
-  <td>Connection between steps</td>
-  <td>Amount extraction → period extraction</td>
+<td>Edge</td>
+<td>Connection between steps</td>
+<td>Amount extraction → period extraction</td>
 </tr>
 <tr>
-  <td>Conditional edge</td>
-  <td>Route selected from current state</td>
-  <td>Valid → save; ambiguous → review</td>
+<td>Conditional edge</td>
+<td>Route selected from current state</td>
+<td>Valid → save; ambiguous → review</td>
 </tr>
 <tr>
-  <td><code>START</code> / <code>END</code></td>
-  <td>Entry and completion markers</td>
-  <td>Begin processing / finish</td>
+<td><code>START</code> / <code>END</code></td>
+<td>Entry and completion markers</td>
+<td>Begin processing / finish</td>
 </tr>
-</tbody>
-</table></div>
+</tbody></table></div>
 <br>
 
 <ul>
 <li>A node can use regex, SQL, an API, or an LLM. A node is not automatically an agent.</li>
 </ul>
-
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=488a1f96" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="4.-State-schemas-and-data-contracts"><span style="color: magenta;">4. State schemas and data contracts</span><a class="anchor-link" href="#4.-State-schemas-and-data-contracts">&#182;</a></h3><ul>
+</div></div></div></div>
+<div id="cell-5" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">4. State schemas and data contracts</span></h3>
+<ul>
 <li>A <span style="color: limegreen;">schema</span> describes fields and expected types. Common choices are <code>TypedDict</code>, dataclasses, and Pydantic.</li>
 <li><code>TypedDict</code> supplies <span style="color: limegreen;">type hints</span>; it <span style="color: limegreen;">does not validate values at runtime</span>. <span style="color: limegreen;">Pydantic supports runtime validation</span>.</li>
 <li>You can <span style="color: limegreen;">separate input, internal, and output schemas</span>. This keeps intermediate data out of the returned result.</li>
@@ -15456,36 +15386,18 @@ body.jp-Notebook .jp-Cell:focus-within {
 <li><span style="color: limegreen;">Correct structure does not prove factual correctness</span>: amount=5000 can satisfy the schema while contradicting the email.</li>
 <li>Keep checkpointed data serializable. Pass clients and connections through appropriate runtime dependencies.</li>
 </ul>
-
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=8c7cd5bd" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="5.-Nodes-and-partial-updates"><span style="color: magenta;">5. Nodes and partial updates</span><a class="anchor-link" href="#5.-Nodes-and-partial-updates">&#182;</a></h3><ul>
+</div></div></div></div>
+<div id="cell-6" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">5. Nodes and partial updates</span></h3>
+<ul>
 <li>A node <span style="color: limegreen;">reads state</span> and <span style="color: limegreen;">returns the fields it changes</span>. Other fields remain available.</li>
 <li>Return updates rather than directly mutating the input state.</li>
 <li>Example: an amount node returns {&quot;amounts&quot;: [...]}; it need not return the email again.</li>
 <li>Separate steps when they have different retry, review, or debugging requirements.</li>
 <li><span style="color: limegreen;">Excessively large nodes</span> repeat <span style="color: limegreen;">more work after failure</span>. <span style="color: limegreen;">Excessively fragmented nodes</span> add <span style="color: limegreen;">complexity</span>. Choose boundaries around meaningful operations.</li>
 </ul>
-
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=de24fa1a" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="6.-Reducers:-combining-updates"><span style="color: magenta;">6. Reducers: combining updates</span><a class="anchor-link" href="#6.-Reducers:-combining-updates">&#182;</a></h3><ul>
+</div></div></div></div>
+<div id="cell-7" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">6. Reducers: combining updates</span></h3>
+<ul>
 <li>By default, a new value replaces the existing field value.</li>
 <li>A reducer <span style="color: limegreen;">defines how old and new values combine</span>. List concatenation is one example.</li>
 <li>With operator.add, [&quot;error A&quot;] plus [&quot;error B&quot;] becomes [&quot;error A&quot;, &quot;error B&quot;].</li>
@@ -15493,46 +15405,16 @@ body.jp-Notebook .jp-Cell:focus-within {
 <li>Returning [] to an append field does not clear it. Overwrite can bypass the reducer.</li>
 <li>Use replacement for revised extraction results; accumulation for genuinely additive information.</li>
 </ul>
-
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=adf5e369" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="7.-Messages-and-conversation-history"><span style="color: magenta;">7. Messages and conversation history</span><a class="anchor-link" href="#7.-Messages-and-conversation-history">&#182;</a></h3><ul>
+</div></div></div></div>
+<div id="cell-8" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"><h3><span style="color: magenta;">7. Messages and conversation history</span></h3>
+<ul>
 <li>Agent applications often store human, AI, and tool messages in state.</li>
 <li><code>MessagesState</code> provides a ready-made messages field.</li>
 <li>Its <code>add_messages</code> reducer <span style="color: limegreen;">appends new messages and updates existing ones by message ID</span>.</li>
 <li>Plain list concatenation cannot handle message replacement correctly.</li>
 <li>Stored state is not automatically sent to the LLM. <span style="color: limegreen;">Your model-calling node decides which history and fields enter the request</span>.</li>
 </ul>
-
-</div>
-</div>
-</div>
-</div>
-<div id="cell-id=39db7567" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-
-</div>
-</div>
-</div>
-</div>
+</div></div></div></div>
+<div id="cell-9" class="jp-Cell jp-MarkdownCell jp-Notebook-cell"><div class="jp-Cell-inputWrapper"><div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown"></div></div></div></div>
 </body>
-
-
-
-
-
-
-
 </html>
