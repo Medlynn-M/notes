@@ -15227,7 +15227,60 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
     display: none;
   }
 </style>
-<!-- End of mermaid configuration --></head>
+<!-- End of mermaid configuration -->
+<style id="responsive-notes-layout">
+html { color-scheme: dark; }
+body.jp-Notebook {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 28px 32px 48px;
+}
+.jp-Cell, .jp-Cell-inputWrapper, .jp-Cell-inputArea,
+.jp-RenderedMarkdown { min-width: 0; max-width: 100%; }
+.jp-MarkdownCell .jp-InputPrompt { display: none; }
+.jp-MarkdownOutput.jp-RenderedHTMLCommon { padding-left: 0; padding-right: 0; }
+.jp-RenderedMarkdown { text-align: left; overflow-wrap: anywhere; line-height: 1.65; }
+.notes-title { text-align: center; }
+.jp-RenderedMarkdown img, .jp-RenderedMarkdown svg { max-width: 100%; height: auto; }
+.jp-RenderedMarkdown pre { max-width: 100%; overflow-x: auto; overflow-wrap: normal; white-space: pre; }
+.notes-table-scroll { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.jp-RenderedMarkdown table { width: 100%; margin: 12px 0; }
+.jp-RenderedMarkdown th, .jp-RenderedMarkdown td { white-space: normal; overflow-wrap: break-word; }
+@media (max-width: 640px) {
+  body.jp-Notebook { padding: 16px 14px 32px; }
+  .jp-Notebook .jp-Cell { padding: 4px 0; }
+  .jp-RenderedMarkdown { font-size: 16px; }
+  .jp-RenderedMarkdown ul, .jp-RenderedMarkdown ol { padding-left: 1.35em; }
+  .jp-RenderedMarkdown h1 { font-size: 1.7em; }
+  .jp-RenderedMarkdown h2 { font-size: 1.4em; }
+  .jp-RenderedMarkdown h3 { font-size: 1.2em; }
+  .jp-RenderedMarkdown table { min-width: 520px; font-size: 14px; }
+  .jp-RenderedMarkdown th, .jp-RenderedMarkdown td { padding: 8px 10px; }
+}
+</style>
+
+<style id="notes-block-highlight">
+body.jp-Notebook .jp-Cell {
+  border-radius: 8px;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+@media (hover: hover) {
+  body.jp-Notebook .jp-Cell:hover {
+    background-color: rgba(121, 184, 255, 0.08);
+    box-shadow: inset 3px 0 0 #79b8ff;
+  }
+}
+body.jp-Notebook .jp-Cell:focus-within {
+  background-color: rgba(121, 184, 255, 0.08);
+  box-shadow: inset 3px 0 0 #79b8ff;
+}
+@media (prefers-reduced-motion: reduce) {
+  body.jp-Notebook .jp-Cell { transition: none; }
+}
+</style>
+</head>
 <body class="jp-Notebook" data-jp-theme-light="false" data-jp-theme-name="JupyterLab Dark">
 
 <div id="cell-id=4f10fd93" class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
@@ -15236,7 +15289,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2><b><center><span style="color:blue">LANGGRAPH
+<h2 class="notes-title"><b><span style="color:#79b8ff">LANGGRAPH</span></b></h2>
 
 
 </div>
@@ -15274,11 +15327,11 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<table>
+<div class="notes-table-scroll"><table>
 <thead>
 <tr>
-  <th><span style="color: magenta;"><center>Component</span></th>
-  <th><span style="color: magenta;"><center>Main responsibility</span></th>
+  <th><span style="color: magenta;">Component</span></th>
+  <th><span style="color: magenta;">Main responsibility</span></th>
 </tr>
 </thead>
 <tbody>
@@ -15303,7 +15356,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
   <td>Trace, evaluate, debug, and deploy applications</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <br>
 
 <ul>
@@ -15338,12 +15391,12 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="3.-State,-nodes,-and-edges"><span style="color: magenta;">3. State, nodes, and edges</span><a class="anchor-link" href="#3.-State,-nodes,-and-edges">&#182;</a></h3><table>
+<h3 id="3.-State,-nodes,-and-edges"><span style="color: magenta;">3. State, nodes, and edges</span><a class="anchor-link" href="#3.-State,-nodes,-and-edges">&#182;</a></h3><div class="notes-table-scroll"><table>
 <thead>
 <tr>
-  <th><span style="color: magenta;"><center>Concept</span></th>
-  <th><span style="color: magenta;"><center>Meaning</span></th>
-  <th><span style="color: magenta;"><center>Email extraction example</span></th>
+  <th><span style="color: magenta;">Concept</span></th>
+  <th><span style="color: magenta;">Meaning</span></th>
+  <th><span style="color: magenta;">Email extraction example</span></th>
 </tr>
 </thead>
 <tbody>
@@ -15373,7 +15426,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
   <td>Begin processing / finish</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <br>
 
 <ul>
