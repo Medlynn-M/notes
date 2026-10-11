@@ -15263,21 +15263,26 @@ body.jp-Notebook {
 
 <style id="notes-block-highlight">
 body.jp-Notebook .jp-Cell {
+  position: relative;
   border-radius: 8px;
-  transition: background-color 160ms ease, box-shadow 160ms ease;
+  transform-origin: center;
+  transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
 }
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   body.jp-Notebook .jp-Cell:hover {
-    background-color: rgba(121, 184, 255, 0.08);
-    box-shadow: inset 3px 0 0 #79b8ff;
+    z-index: 1;
+    transform: scale(1.015);
+    background-color: rgba(255, 255, 255, 0.045);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
   }
 }
 body.jp-Notebook .jp-Cell:focus-within {
-  background-color: rgba(121, 184, 255, 0.08);
-  box-shadow: inset 3px 0 0 #79b8ff;
+  background-color: rgba(255, 255, 255, 0.045);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 @media (prefers-reduced-motion: reduce) {
   body.jp-Notebook .jp-Cell { transition: none; }
+  body.jp-Notebook .jp-Cell:hover { transform: none; }
 }
 </style>
 </head>
