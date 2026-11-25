@@ -404,3 +404,29 @@ body.jp-Notebook #main-content h2.deepagents-page-title {
 body.jp-Notebook #main-content h2.deepagents-page-title b {
   display: inline-block !important;
 }
+
+
+/* Deep Agents title: fix the exported notebook's narrow/flex cell wrapper. */
+body.jp-Notebook #main-content > #cell-0,
+body.jp-Notebook #main-content > #cell-0 .jp-Cell-inputWrapper,
+body.jp-Notebook #main-content > #cell-0 .jp-InputArea,
+body.jp-Notebook #main-content > #cell-0 .jp-RenderedHTMLCommon,
+body.jp-Notebook #main-content > #cell-0 .jp-RenderedMarkdown {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+body.jp-Notebook #main-content #deep-agents-title {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  margin: 28px 0 24px !important;
+}
+body.jp-Notebook #main-content #deep-agents-title > b {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+}
