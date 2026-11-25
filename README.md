@@ -16,10 +16,10 @@ A small, responsive learning site for AI engineering notes.
 
 All pages use the same site shell and shared behavior:
 
-- Responsive header with a complete topic navigation list and active-page indicator
+- Responsive header with a complete topic navigation list and active-page indicator, generated from the canonical topic registry
 - Consistent footer with All notes and Back to top
 - On topic pages: sticky study panel with search, section jump, and reading progress
-- Search highlights matching note blocks; the section selector is populated from the page’s section headings
+- Search indexes every topic page and returns cross-module results; the section selector is populated from all page headings
 - Shared copy-code and quiz behavior
 - Shared responsive layout, table/code overflow handling, and reduced-motion support
 
@@ -44,4 +44,4 @@ To keep the site uniform when adding another note:
 5. Keep the page structure as `header.site-header`, `main#main-content`, and `footer.site-footer`. Use `h3` for section headings so the section selector can discover them.
 6. Check the page at laptop and phone widths, including long tables, code blocks, and quiz answer text.
 
-The topic list in `common.js` is the canonical registry. GitHub Pages is static, so new files are not automatically discovered from the repository directory.
+The topic list in `common.js` is the canonical registry. GitHub Pages is static, so new files are not automatically discovered from the repository directory. Add each new topic there once; shared navigation, hub cards, module selection, and cross-topic search then use that registry automatically.
