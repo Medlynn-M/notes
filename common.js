@@ -32,6 +32,8 @@
       document.body.insertBefore(header, document.body.firstChild);
     }
 
+    header.id = 'top';
+
     let brand = header.querySelector('.site-brand');
     if (!brand) {
       brand = document.createElement('a');
