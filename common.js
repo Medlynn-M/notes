@@ -82,7 +82,7 @@ if (quiz) {
   let panel = document.querySelector('.da-learning-bar');
   if (panel) {
     panel.classList.add('study-panel');
-    panel.classList.remove('da-learning-bar');
+    
   } else {
     panel = document.createElement('section');
     panel.className = 'study-panel';
