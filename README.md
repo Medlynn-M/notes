@@ -16,7 +16,8 @@ A small, responsive learning site for AI engineering notes.
 
 All pages use the same site shell and shared behavior:
 
-- Responsive header with a complete topic navigation list and active-page indicator, generated from the canonical topic registry
+- Fixed responsive header with a complete topic navigation list and active-page indicator, generated from the canonical topic registry
+- Reading-progress indicator anchored to the viewport below the header on topic pages
 - Consistent footer with All notes and Back to top
 - On topic pages: sticky study panel with search, section jump, and reading progress
 - Search indexes every topic page and returns cross-module results; the section selector is populated from all page headings
