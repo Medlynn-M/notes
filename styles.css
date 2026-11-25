@@ -281,3 +281,99 @@ body.jp-Notebook #main-content h2.deepagents-page-title b {
   margin:0 auto!important;
   text-align:center!important;
 }
+
+
+/* Fixed site navigation with a reserved flow spacer, so the header and
+   reading-progress indicator stay visible without covering note content. */
+.site-header.site-header-sticky {
+  --site-header-flow-gap: 22px;
+  position: fixed !important;
+  top: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%);
+  z-index: 1000 !important;
+  width: min(calc(100vw - 24px), 1176px) !important;
+  max-width: 1176px !important;
+  margin: 0 !important;
+  padding: 12px 0 16px !important;
+  background: rgba(0, 0, 0, .97) !important;
+  border-bottom: 1px solid var(--notes-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .28);
+  backdrop-filter: blur(14px);
+}
+.site-header-spacer {
+  display: block !important;
+  width: 100%;
+  min-height: 0;
+  pointer-events: none;
+}
+.site-header.site-header-sticky .site-reading-progress {
+  bottom: -1px !important;
+  height: 3px !important;
+  z-index: 2;
+}
+html {
+  scroll-padding-top: var(--site-header-offset, 120px) !important;
+}
+body.jp-Notebook main h2[id],
+body.jp-Notebook main h3[id],
+body.jp-Notebook main h4[id] {
+  scroll-margin-top: var(--site-header-offset, 120px) !important;
+}
+@media (max-width: 850px) {
+  .site-header.site-header-sticky {
+    --site-header-flow-gap: 16px;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 8px !important;
+    padding: 10px 0 14px !important;
+  }
+  .site-header.site-header-sticky nav {
+    justify-content: flex-start !important;
+  }
+}
+@media (max-width: 640px) {
+  .site-header.site-header-sticky {
+    --site-header-flow-gap: 12px;
+    width: calc(100vw - 24px) !important;
+    padding: 8px 0 12px !important;
+    gap: 6px !important;
+  }
+  .site-header.site-header-sticky .site-brand {
+    font-size: 17px !important;
+    line-height: 1.25;
+  }
+  .site-header.site-header-sticky .site-brand span {
+    margin-top: 2px;
+    font-size: 11px;
+  }
+  .site-header.site-header-sticky nav {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    gap: 3px !important;
+    width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    padding-bottom: 1px;
+  }
+  .site-header.site-header-sticky nav::-webkit-scrollbar {
+    display: none;
+  }
+  .site-header.site-header-sticky nav a {
+    flex: 0 0 auto !important;
+    min-height: 40px !important;
+    padding: 8px 9px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    scroll-snap-align: start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header.site-header-sticky,
+  .site-header.site-header-sticky .site-reading-progress span {
+    transition: none !important;
+  }
+}
