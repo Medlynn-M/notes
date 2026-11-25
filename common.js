@@ -70,6 +70,10 @@
   }
 
   function normalizeFooter(main) {
+    if (currentFile === 'index.html') {
+      document.querySelectorAll('.site-footer').forEach(footer => footer.remove());
+      return;
+    }
     let footer = document.querySelector('.site-footer');
     if (!footer) {
       footer = document.createElement('footer');
