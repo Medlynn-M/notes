@@ -377,3 +377,47 @@ body.jp-Notebook main h4[id] {
     transition: none !important;
   }
 }
+
+
+/* Fixed viewport header + progress track, shared by every notes page. */
+html, body.jp-Notebook { overflow-x: clip !important; }
+.site-header.site-header-sticky {
+  position: fixed !important; inset: 0 0 auto 0 !important; left: 0 !important;
+  transform: none !important; width: 100% !important; max-width: none !important;
+  margin: 0 !important;
+  padding: 12px max(12px, calc((100vw - 1176px) / 2)) 16px !important;
+  background: rgba(0, 0, 0, .98) !important;
+  border-bottom: 1px solid var(--notes-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .28); z-index: 1000 !important;
+}
+.site-header.site-header-sticky .site-reading-progress {
+  position: absolute !important; left: 0 !important; right: 0 !important;
+  bottom: -1px !important; height: 3px !important; overflow: hidden !important;
+  background: #252525 !important;
+}
+.site-header.site-header-sticky .site-reading-progress span {
+  display: block !important; height: 100% !important; width: 0;
+  background: linear-gradient(90deg, var(--study-teal), var(--study-amber)) !important;
+  transition: width .12s linear;
+}
+.site-header-spacer { display: block !important; width: 100% !important; pointer-events: none !important; }
+@media (max-width: 850px) {
+  .site-header.site-header-sticky { padding: 10px 16px 14px !important; gap: 8px !important; }
+  .site-header.site-header-sticky nav { justify-content: flex-start !important; }
+}
+@media (max-width: 640px) {
+  .site-header.site-header-sticky { padding: 8px 12px 12px !important; gap: 5px !important; }
+  .site-header.site-header-sticky .site-brand { font-size: 17px !important; line-height: 1.25 !important; }
+  .site-header.site-header-sticky .site-brand span { margin-top: 2px !important; font-size: 11px !important; }
+  .site-header.site-header-sticky nav {
+    display: flex !important; flex-wrap: nowrap !important; justify-content: flex-start !important;
+    gap: 3px !important; width: 100% !important; overflow-x: auto !important; overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none; overscroll-behavior-x: contain; padding-bottom: 1px;
+  }
+  .site-header.site-header-sticky nav::-webkit-scrollbar { display: none; }
+  .site-header.site-header-sticky nav a {
+    flex: 0 0 auto !important; min-height: 40px !important; padding: 8px 9px !important;
+    font-size: 12px !important; white-space: nowrap !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) { .site-header.site-header-sticky .site-reading-progress span { transition: none !important; } }
