@@ -103,37 +103,119 @@
   }
 
   function createStudyPanel(header, main) {
-    if (currentFile === 'index.html') return null;
-
-    // Remove the old Deep Agents-only panel. Every topic page now uses one shared panel.
     document.querySelectorAll('.da-learning-bar, .study-panel').forEach(panel => panel.remove());
-
+    const isHub = currentFile === 'index.html';
     const panel = document.createElement('section');
     panel.className = 'study-panel';
-    panel.setAttribute('aria-label', 'Notes study controls');
-    panel.innerHTML = `
-      <div class="study-top">
-        <div class="study-heading">
-          <div class="study-kicker">NOTES · STUDY MODE</div>
-          <div class="study-title">Navigate the course notes</div>
-        </div>
-        <div class="study-controls">
-          <input class="study-search" type="search" placeholder="Search notes…" aria-label="Search note content">
-          <select class="study-jump" aria-label="Jump to a section">
-            <option value="">Jump to a section…</option>
-          </select>
-        </div>
-      </div>
-      <div class="study-progress">
-        <span class="study-progress-label">Reading progress · 0%</span>
-        <div class="study-progress-track" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <div class="study-progress-fill"></div>
-        </div>
-      </div>
-      <div class="study-status" aria-live="polite">Search highlights matching sections. Clear the search to return to the full page.</div>`;
+    panel.setAttribute('aria-label', isHub ? 'Search all notes' : 'Notes study controls');
+    panel.innerHTML =
+      '<div class="study-top">' +
+        '<div class="study-heading">' +
+          '<div class="study-kicker">NOTES · STUDY MODE</div>' +
+          '<div class="study-title">' + (isHub ? 'Find a concept across all notes' : 'Navigate and search the course notes') + '</div>' +
+        '</div>' +
+        '<div class="study-controls">' +
+          '<input class="study-search" type="search" placeholder="Search all notes…" aria-label="Search all note content" autocomplete="off">' +
+          '<select class="study-jump" aria-label="' + (isHub ? 'Choose a notes module' : 'Jump to a section') + '">' +
+            '<option value="">' + (isHub ? 'Choose a module…' : 'Jump to a section…') + '</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>' +
+      (isHub ? '' :
+        '<div class="study-progress">' +
+          '<span class="study-progress-label">Reading progress · 0%</span>' +
+          '<div class="study-progress-track" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">' +
+            '<div class="study-progress-fill"></div>' +
+          '</div>' +
+        '</div>') +
+      '<div class="study-status" aria-live="polite">Search works across every notes module. Select a result to open its location.</div>' +
+      '<div class="study-results" aria-label="Search results" hidden></div>';
     if (header) header.insertAdjacentElement('afterend', panel);
     else if (main) main.insertAdjacentElement('beforebegin', panel);
     return panel;
+  }
+
+  function slugify(text) {
+    return text.toLocaleLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64) || 'section';
+  }
+
+  function prepareNavigationIds(main) {
+    if (!main) return [];
+    const headings = [...main.querySelectorAll('h2,h3,h4')]
+      .filter(heading => !heading.closest('.quiz, #knowledge-check'))
+      .filter(heading => heading.textContent.replace(/¶/g, '').trim());
+    headings.forEach((heading, index) => {
+      if (!heading.id) heading.id = 'notes-' + slugify(heading.textContent.replace(/¶/g, '').trim()) + '-' + (index + 1);
+    });
+    [...main.querySelectorAll('.jp-Cell')].forEach((cell, index) => {
+      if (!cell.id) cell.id = 'note-cell-' + (index + 1);
+    });
+    return headings;
+  }
+
+  let searchDocumentsPromise = null;
+
+  async function loadSearchDocuments() {
+    if (searchDocumentsPromise) return searchDocumentsPromise;
+    searchDocumentsPromise = Promise.all(TOPICS.filter(topic => topic.file !== 'index.html').map(async topic => {
+      const response = await fetch(topic.file, { cache: 'force-cache' });
+      if (!response.ok) throw new Error('Unable to load ' + topic.label);
+      const html = await response.text();
+      const parsed = new DOMParser().parseFromString(html, 'text/html');
+      const pageMain = parsed.querySelector('#main-content') || parsed.body;
+      const headings = prepareNavigationIds(pageMain);
+      const cells = [...pageMain.querySelectorAll('.jp-Cell')];
+      const searchable = cells.length ? cells : [...pageMain.children];
+      const records = searchable.map((cell, index) => {
+        const text = (cell.innerText || cell.textContent || '').replace(/\s+/g, ' ').trim();
+        if (!cell.id) cell.id = 'note-cell-' + (index + 1);
+        let heading = cell.querySelector('h2,h3,h4');
+        if (!heading) {
+          heading = headings.filter(item => item.compareDocumentPosition(cell) & Node.DOCUMENT_POSITION_FOLLOWING).pop() || null;
+        }
+        return {
+          topic: topic,
+          text: text,
+          href: topic.file + '#' + (heading ? heading.id : cell.id),
+          heading: heading ? heading.textContent.replace(/¶/g, '').trim() : topic.label
+        };
+      }).filter(record => record.text.length > 0);
+      return { topic: topic, records: records };
+    }));
+    return searchDocumentsPromise;
+  }
+
+  function renderSearchResults(container, matches, query) {
+    container.replaceChildren();
+    container.hidden = !query;
+    if (!query) return;
+    const shown = matches.slice(0, 30);
+    if (!shown.length) {
+      const empty = document.createElement('p');
+      empty.className = 'study-result-empty';
+      empty.textContent = 'No matching notes found. Try a broader keyword.';
+      container.appendChild(empty);
+      return;
+    }
+    shown.forEach(match => {
+      const link = document.createElement('a');
+      link.className = 'study-result';
+      link.href = match.href;
+      const title = document.createElement('strong');
+      title.textContent = match.topic.label + ' · ' + match.heading;
+      const snippet = document.createElement('span');
+      const position = match.text.toLocaleLowerCase().indexOf(query);
+      const start = Math.max(0, position - 65);
+      snippet.textContent = (start ? '…' : '') + match.text.slice(start, Math.min(match.text.length, position + query.length + 110)) + (position + query.length + 110 < match.text.length ? '…' : '');
+      link.append(title, snippet);
+      container.appendChild(link);
+    });
+    if (matches.length > shown.length) {
+      const more = document.createElement('p');
+      more.className = 'study-result-count';
+      more.textContent = 'Showing ' + shown.length + ' of ' + matches.length + ' matches.';
+      container.appendChild(more);
+    }
   }
 
   function initializeStudyPanel(panel, main) {
@@ -141,64 +223,106 @@
     const search = panel.querySelector('.study-search');
     const jump = panel.querySelector('.study-jump');
     const status = panel.querySelector('.study-status');
-    const progressLabel = panel.querySelector('.study-progress-label');
-    const progressFill = panel.querySelector('.study-progress-fill');
-    const progressTrack = panel.querySelector('.study-progress-track');
-    if (!search || !jump || !progressLabel || !progressFill || !progressTrack) return;
+    const results = panel.querySelector('.study-results');
+    const isHub = currentFile === 'index.html';
+    if (!search || !jump || !status || !results) return;
 
-    const headings = [...main.querySelectorAll('h3')]
-      .filter(heading => !heading.closest('.quiz, #knowledge-check'))
-      .filter(heading => heading.textContent.replace(/¶/g, '').trim());
-    jump.replaceChildren(new Option('Jump to a section…', ''));
-    headings.forEach((heading, index) => {
-      if (!heading.id) heading.id = 'study-section-' + (index + 1);
-      const option = new Option(heading.textContent.replace(/¶/g, '').trim(), heading.id);
-      jump.add(option);
-    });
-    jump.addEventListener('change', () => {
-      const target = jump.value ? document.getElementById(jump.value) : null;
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-
-    const blocks = [...main.querySelectorAll('.jp-Cell')];
-    search.addEventListener('input', () => {
-      const query = search.value.trim().toLocaleLowerCase();
-      let matches = 0;
-      blocks.forEach(block => {
-        block.classList.remove('study-search-hit', 'study-search-muted');
-        if (!query) return;
-        const hit = block.textContent.toLocaleLowerCase().includes(query);
-        block.classList.add(hit ? 'study-search-hit' : 'study-search-muted');
-        if (hit) matches++;
+    if (isHub) {
+      TOPICS.filter(topic => topic.file !== 'index.html').forEach(topic => {
+        jump.add(new Option(topic.label, topic.file));
       });
-      if (status) {
-        status.textContent = query
-          ? (matches ? matches + ' matching section(s) highlighted. Use the selector to jump.' : 'No matching content found. Try another term.')
-          : 'Search highlights matching sections. Clear the search to return to the full page.';
-      }
-    });
-
-    let frame = 0;
-    const updateProgress = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-        const percent = maxScroll ? Math.min(100, Math.max(0, Math.round(window.scrollY / maxScroll * 100))) : 100;
-        progressFill.style.width = percent + '%';
-        progressLabel.textContent = 'Reading progress · ' + percent + '%';
-        progressTrack.setAttribute('aria-valuenow', String(percent));
+      jump.addEventListener('change', () => {
+        if (jump.value) window.location.href = jump.value;
       });
-    };
-    window.addEventListener('scroll', updateProgress, { passive: true });
-    window.addEventListener('resize', updateProgress);
-    if ('ResizeObserver' in window) {
-      const observer = new ResizeObserver(updateProgress);
-      observer.observe(main);
-      main.studyProgressObserver = observer;
+    } else {
+      const headings = prepareNavigationIds(main);
+      jump.replaceChildren(new Option('Jump to a section…', ''));
+      headings.forEach(heading => {
+        const depth = Math.max(0, Number(heading.tagName.slice(1)) - 2);
+        const label = (depth ? '　'.repeat(depth) + '↳ ' : '') + heading.textContent.replace(/¶/g, '').trim();
+        jump.add(new Option(label, heading.id));
+      });
+      jump.addEventListener('change', () => {
+        const target = jump.value ? document.getElementById(jump.value) : null;
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     }
-    window.addEventListener('load', updateProgress, { once: true });
-    updateProgress();
+
+    const localCells = [...main.querySelectorAll('.jp-Cell')];
+    let searchTimer = 0;
+    search.addEventListener('input', () => {
+      window.clearTimeout(searchTimer);
+      searchTimer = window.setTimeout(async () => {
+        const query = search.value.trim().toLocaleLowerCase();
+        localCells.forEach(cell => {
+          cell.classList.remove('study-search-hit', 'study-search-muted');
+          if (!query) return;
+          const hit = (cell.innerText || cell.textContent || '').toLocaleLowerCase().includes(query);
+          cell.classList.add(hit ? 'study-search-hit' : 'study-search-muted');
+        });
+        if (!query) {
+          results.replaceChildren();
+          results.hidden = true;
+          status.textContent = 'Search works across every notes module. Select a result to open its location.';
+          return;
+        }
+        status.textContent = 'Searching all notes…';
+        try {
+          const documents = await loadSearchDocuments();
+          const matches = [];
+          documents.forEach(document => document.records.forEach(record => {
+            if (record.text.toLocaleLowerCase().includes(query)) {
+              matches.push({
+                topic: document.topic,
+                heading: record.heading,
+                href: record.href,
+                text: record.text
+              });
+            }
+          }));
+          renderSearchResults(results, matches, query);
+          status.textContent = matches.length
+            ? matches.length + ' matching note block(s) across ' + documents.length + ' modules. Select a result to open it.'
+            : 'No matching notes found. Try a broader keyword.';
+        } catch (error) {
+          results.replaceChildren();
+          results.hidden = true;
+          status.textContent = 'Search could not load every notes page. Check your connection and try again.';
+        }
+      }, 160);
+    });
+
+    if (!isHub) {
+      const progressLabel = panel.querySelector('.study-progress-label');
+      const progressFill = panel.querySelector('.study-progress-fill');
+      const progressTrack = panel.querySelector('.study-progress-track');
+      if (progressLabel && progressFill && progressTrack) {
+        let frame = 0;
+        const updateProgress = () => {
+          if (frame) return;
+          frame = window.requestAnimationFrame(() => {
+            frame = 0;
+            const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+            const percent = maxScroll
+              ? Math.min(100, Math.max(0, Math.round(window.scrollY / maxScroll * 100)))
+              : 100;
+            progressFill.style.width = percent + '%';
+            progressLabel.textContent = 'Reading progress · ' + percent + '%';
+            progressTrack.setAttribute('aria-valuenow', String(percent));
+          });
+        };
+        window.addEventListener('scroll', updateProgress, { passive: true });
+        window.addEventListener('resize', updateProgress);
+        if ('ResizeObserver' in window) {
+          const observer = new ResizeObserver(updateProgress);
+          observer.observe(main);
+          observer.observe(panel);
+          main.studyProgressObserver = observer;
+        }
+        window.addEventListener('load', updateProgress, { once: true });
+        updateProgress();
+      }
+    }
   }
 
   function initializeCopyButtons() {
