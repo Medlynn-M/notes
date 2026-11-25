@@ -195,6 +195,7 @@
     if ('ResizeObserver' in window) {
       const observer = new ResizeObserver(updateProgress);
       observer.observe(main);
+      main.studyProgressObserver = observer;
     }
     window.addEventListener('load', updateProgress, { once: true });
     updateProgress();
