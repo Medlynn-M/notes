@@ -33,6 +33,7 @@
     }
 
     header.id = 'top';
+    header.classList.add('site-header-sticky');
 
     let brand = header.querySelector('.site-brand');
     if (!brand) {
@@ -50,6 +51,22 @@
     }
     nav.setAttribute('aria-label', 'Notes navigation');
     nav.replaceChildren(...TOPICS.map(buildTopicLink));
+    let progress = header.querySelector('.site-reading-progress');
+    if (currentFile !== 'index.html') {
+      if (!progress) {
+        progress = document.createElement('div');
+        progress.className = 'site-reading-progress';
+        progress.setAttribute('role', 'progressbar');
+        progress.setAttribute('aria-label', 'Reading progress');
+        progress.setAttribute('aria-valuemin', '0');
+        progress.setAttribute('aria-valuemax', '100');
+        progress.setAttribute('aria-valuenow', '0');
+        progress.innerHTML = '<span></span>';
+        header.appendChild(progress);
+      }
+    } else if (progress) {
+      progress.remove();
+    }
   }
 
   function normalizeFooter(main) {
@@ -104,31 +121,18 @@
 
   function createStudyPanel(header, main) {
     document.querySelectorAll('.da-learning-bar, .study-panel').forEach(panel => panel.remove());
-    const isHub = currentFile === 'index.html';
+    if (currentFile === 'index.html') return null;
     const panel = document.createElement('section');
     panel.className = 'study-panel';
-    panel.setAttribute('aria-label', isHub ? 'Search all notes' : 'Notes study controls');
+    panel.setAttribute('aria-label', 'Search and section navigation');
     panel.innerHTML =
-      '<div class="study-top">' +
-        '<div class="study-heading">' +
-          '<div class="study-kicker">NOTES · STUDY MODE</div>' +
-          '<div class="study-title">' + (isHub ? 'Find a concept across all notes' : 'Navigate and search the course notes') + '</div>' +
-        '</div>' +
-        '<div class="study-controls">' +
-          '<input class="study-search" type="search" placeholder="Search all notes…" aria-label="Search all note content" autocomplete="off">' +
-          '<select class="study-jump" aria-label="' + (isHub ? 'Choose a notes module' : 'Jump to a section') + '">' +
-            '<option value="">' + (isHub ? 'Choose a module…' : 'Jump to a section…') + '</option>' +
-          '</select>' +
-        '</div>' +
+      '<div class="study-controls">' +
+        '<input class="study-search" type="search" placeholder="Search all notes…" aria-label="Search all note content" autocomplete="off">' +
+        '<select class="study-jump" aria-label="Jump to a section">' +
+          '<option value="">Jump to a section…</option>' +
+        '</select>' +
       '</div>' +
-      (isHub ? '' :
-        '<div class="study-progress">' +
-          '<span class="study-progress-label">Reading progress · 0%</span>' +
-          '<div class="study-progress-track" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">' +
-            '<div class="study-progress-fill"></div>' +
-          '</div>' +
-        '</div>') +
-      '<div class="study-status" aria-live="polite">Search works across every notes module. Select a result to open its location.</div>' +
+      '<div class="study-status" aria-live="polite" hidden></div>' +
       '<div class="study-results" aria-label="Search results" hidden></div>';
     if (header) header.insertAdjacentElement('afterend', panel);
     else if (main) main.insertAdjacentElement('beforebegin', panel);
@@ -225,6 +229,7 @@
     const status = panel.querySelector('.study-status');
     const results = panel.querySelector('.study-results');
     const isHub = currentFile === 'index.html';
+    if (!panel) return;
     if (!search || !jump || !status || !results) return;
 
     if (isHub) {
@@ -263,9 +268,11 @@
         if (!query) {
           results.replaceChildren();
           results.hidden = true;
-          status.textContent = 'Search works across every notes module. Select a result to open its location.';
+          status.textContent = '';
+          status.hidden = true;
           return;
         }
+        status.hidden = false;
         status.textContent = 'Searching all notes…';
         try {
           const documents = await loadSearchDocuments();
@@ -281,22 +288,23 @@
             }
           }));
           renderSearchResults(results, matches, query);
+          status.hidden = false;
           status.textContent = matches.length
             ? matches.length + ' matching note block(s) across ' + documents.length + ' modules. Select a result to open it.'
             : 'No matching notes found. Try a broader keyword.';
         } catch (error) {
           results.replaceChildren();
           results.hidden = true;
+          status.hidden = false;
           status.textContent = 'Search could not load every notes page. Check your connection and try again.';
         }
       }, 160);
     });
 
     if (!isHub) {
-      const progressLabel = panel.querySelector('.study-progress-label');
-      const progressFill = panel.querySelector('.study-progress-fill');
-      const progressTrack = panel.querySelector('.study-progress-track');
-      if (progressLabel && progressFill && progressTrack) {
+      const progressTrack = document.querySelector('.site-reading-progress');
+      const progressFill = progressTrack && progressTrack.querySelector('span');
+      if (progressTrack && progressFill) {
         let frame = 0;
         const updateProgress = () => {
           if (frame) return;
@@ -307,7 +315,6 @@
               ? Math.min(100, Math.max(0, Math.round(window.scrollY / maxScroll * 100)))
               : 100;
             progressFill.style.width = percent + '%';
-            progressLabel.textContent = 'Reading progress · ' + percent + '%';
             progressTrack.setAttribute('aria-valuenow', String(percent));
           });
         };
@@ -316,7 +323,7 @@
         if ('ResizeObserver' in window) {
           const observer = new ResizeObserver(updateProgress);
           observer.observe(main);
-          observer.observe(panel);
+          observer.observe(document.querySelector('.site-header'));
           main.studyProgressObserver = observer;
         }
         window.addEventListener('load', updateProgress, { once: true });
