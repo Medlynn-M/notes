@@ -76,7 +76,7 @@ if (quiz) {
 (() => {
   const body = document.body;
   const main = document.querySelector('#main-content');
-  if (!body || !main || body.classList.contains('study-hub')) return;
+  if (!body || !main || body.classList.contains('study-hub') || window.location.pathname.endsWith('/index.html') || window.location.pathname === '/') return;
 
   body.classList.add('study-page');
   let panel = document.querySelector('.da-learning-bar');
