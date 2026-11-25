@@ -252,3 +252,17 @@ body.jp-Notebook main h2[id],body.jp-Notebook main h3[id],body.jp-Notebook main 
  .study-panel{padding:6px 0!important;margin-bottom:16px!important}
  html{scroll-padding-top:115px}
 }
+
+
+/* Center the Deep Agents page title, not the notebook's section headings. */
+body.jp-Notebook #main-content .deepagents-page-title{
+  display:block!important;
+  width:100%!important;
+  text-align:center!important;
+  margin:28px auto 24px!important;
+}
+body.jp-Notebook #main-content .deepagents-page-title b,
+body.jp-Notebook #main-content .deepagents-page-title b span{
+  display:inline-block;
+  text-align:center!important;
+}
