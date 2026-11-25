@@ -69,6 +69,32 @@
     }
   }
 
+  function setupFixedHeader(header) {
+    if (!header) return;
+    let spacer = header.nextElementSibling;
+    if (!spacer || !spacer.classList.contains('site-header-spacer')) {
+      spacer = document.createElement('div');
+      spacer.className = 'site-header-spacer';
+      spacer.setAttribute('aria-hidden', 'true');
+      header.insertAdjacentElement('afterend', spacer);
+    }
+
+    const syncSpacer = () => {
+      const styles = window.getComputedStyle(header);
+      const gap = parseFloat(styles.getPropertyValue('--site-header-flow-gap')) || 0;
+      const height = header.getBoundingClientRect().height + gap;
+      spacer.style.height = height + 'px';
+      document.documentElement.style.setProperty('--site-header-offset', height + 'px');
+    };
+    syncSpacer();
+    if ('ResizeObserver' in window) {
+      const observer = new ResizeObserver(syncSpacer);
+      observer.observe(header);
+      header.siteHeaderResizeObserver = observer;
+    }
+    window.addEventListener('resize', syncSpacer, { passive: true });
+  }
+
   function normalizeFooter(main) {
     if (currentFile === 'index.html') {
       document.querySelectorAll('.site-footer').forEach(footer => footer.remove());
@@ -138,8 +164,11 @@
       '</div>' +
       '<div class="study-status" aria-live="polite" hidden></div>' +
       '<div class="study-results" aria-label="Search results" hidden></div>';
-    if (header) header.insertAdjacentElement('afterend', panel);
-    else if (main) main.insertAdjacentElement('beforebegin', panel);
+    if (header) {
+      const spacer = header.nextElementSibling;
+      if (spacer && spacer.classList.contains('site-header-spacer')) spacer.insertAdjacentElement('afterend', panel);
+      else header.insertAdjacentElement('afterend', panel);
+    } else if (main) main.insertAdjacentElement('beforebegin', panel);
     return panel;
   }
 
@@ -443,6 +472,7 @@
   normalizeTopicCards();
   normalizeFooter(main);
   const header = document.querySelector('.site-header');
+  setupFixedHeader(header);
   const panel = createStudyPanel(header, main);
   initializeStudyPanel(panel, main);
   initializeCopyButtons();
