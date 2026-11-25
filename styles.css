@@ -254,35 +254,6 @@ body.jp-Notebook main h2[id],body.jp-Notebook main h3[id],body.jp-Notebook main 
 }
 
 
-/* Center the Deep Agents page title, not the notebook's section headings. */
-body.jp-Notebook #main-content .deepagents-page-title{
-  display:block!important;
-  width:100%!important;
-  text-align:center!important;
-  margin:28px auto 24px!important;
-}
-body.jp-Notebook #main-content .deepagents-page-title b,
-body.jp-Notebook #main-content .deepagents-page-title b span{
-  display:inline-block;
-  text-align:center!important;
-}
-
-
-/* Keep the Deep Agents title centered regardless of notebook/Jupyter styles. */
-body.jp-Notebook #main-content h2.deepagents-page-title {
-  display:flex!important;
-  justify-content:center!important;
-  align-items:center!important;
-  width:100%!important;
-  text-align:center!important;
-}
-body.jp-Notebook #main-content h2.deepagents-page-title b {
-  display:block!important;
-  margin:0 auto!important;
-  text-align:center!important;
-}
-
-
 /* Fixed site navigation with a reserved flow spacer, so the header and
    reading-progress indicator stay visible without covering note content. */
 .site-header.site-header-sticky {
@@ -421,3 +392,15 @@ html, body.jp-Notebook { overflow-x: clip !important; }
   }
 }
 @media (prefers-reduced-motion: reduce) { .site-header.site-header-sticky .site-reading-progress span { transition: none !important; } }
+
+
+/* Deep Agents title uses the same centered heading layout as other topics. */
+body.jp-Notebook #main-content h2.deepagents-page-title {
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+  margin: 28px auto 24px !important;
+}
+body.jp-Notebook #main-content h2.deepagents-page-title b {
+  display: inline-block !important;
+}
