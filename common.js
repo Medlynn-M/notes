@@ -468,6 +468,35 @@
   }
 
   const main = document.querySelector('#main-content');
+
+  // The exported Deep Agents title sits inside Jupyter's first Markdown cell.
+  // Normalize that cell's flex/narrow wrappers so text-align centers against the page width.
+  function normalizeDeepAgentsTitle(main) {
+    const title = main && main.querySelector('h2.deepagents-page-title');
+    if (!title) return;
+    title.id = 'deep-agents-title';
+    const cell = title.closest('.jp-Cell');
+    const wrappers = cell ? [cell, cell.querySelector('.jp-Cell-inputWrapper'), cell.querySelector('.jp-InputArea'), cell.querySelector('.jp-RenderedHTMLCommon'), cell.querySelector('.jp-RenderedMarkdown')] : [];
+    wrappers.filter(Boolean).forEach(wrapper => {
+      wrapper.style.setProperty('display', 'block', 'important');
+      wrapper.style.setProperty('width', '100%', 'important');
+      wrapper.style.setProperty('max-width', '100%', 'important');
+      wrapper.style.setProperty('min-width', '0', 'important');
+    });
+    title.style.setProperty('display', 'block', 'important');
+    title.style.setProperty('width', '100%', 'important');
+    title.style.setProperty('max-width', '100%', 'important');
+    title.style.setProperty('text-align', 'center', 'important');
+    title.style.setProperty('margin', '28px 0 24px', 'important');
+    const titleText = title.querySelector('b');
+    if (titleText) {
+      titleText.style.setProperty('display', 'block', 'important');
+      titleText.style.setProperty('width', '100%', 'important');
+      titleText.style.setProperty('text-align', 'center', 'important');
+    }
+  }
+
+  normalizeDeepAgentsTitle(main);
   normalizeHeader();
   normalizeTopicCards();
   normalizeFooter(main);
