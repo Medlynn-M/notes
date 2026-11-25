@@ -266,3 +266,18 @@ body.jp-Notebook #main-content .deepagents-page-title b span{
   display:inline-block;
   text-align:center!important;
 }
+
+
+/* Keep the Deep Agents title centered regardless of notebook/Jupyter styles. */
+body.jp-Notebook #main-content h2.deepagents-page-title {
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  width:100%!important;
+  text-align:center!important;
+}
+body.jp-Notebook #main-content h2.deepagents-page-title b {
+  display:block!important;
+  margin:0 auto!important;
+  text-align:center!important;
+}
